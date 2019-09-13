@@ -25,10 +25,16 @@ namespace myEntityRepository
 
         //Der Value eines jeden Mementos enthält den "alive"-Zustand und bestimmt ob diese objekt gespeichert oder gelöscht wird
         private List<Dictionary<Entity, bool>> _mementos;
+        private List<Memento> mementos;
 
         #endregion
 
         #region accessors
+        private List<Memento> _Mementos //Logs von Entityzuständen
+        {
+            get { return mementos; }
+            set { mementos = value; }
+        }
         private List<Dictionary<Entity, bool>> Mementos //Logs von Entityzuständen
         {
             get { return _mementos; }
@@ -68,6 +74,7 @@ namespace myEntityRepository
             Types = types;
             Entities = new Dictionary<Type, List<Entity>>();
             NextId = new Dictionary<Type, int>();
+            _Mementos = new List<Memento>();
             Mementos = new List<Dictionary<Entity, bool>>();
             foreach (Type type in Types)
             {
@@ -84,7 +91,7 @@ namespace myEntityRepository
 
         public bool IsDirty() //Ungespeicherte Änderungen?
         {
-            return (Mementos.Count() > 0);
+            return (_Mementos.Count() > 0);
         }
         private int GetNextId(Type eType) //Simuliere nächste Inkrement ID?
         {
@@ -129,15 +136,12 @@ namespace myEntityRepository
         {
             Dictionary<Type, List<int>> handled = new Dictionary<Type, List<int>>();
 
-            Mementos.Reverse();
-            foreach (Dictionary<Entity, bool> dictionary in Mementos)
+            _Mementos.Reverse();
+            foreach (Memento memento in _Mementos)
             {
-                dictionary.Reverse();
-                foreach (KeyValuePair<Entity, bool> entry in dictionary)
-                {
+                Entity entity = memento.Entity;
+                bool alive = memento.IsAlive;
 
-                    Entity entity = entry.Key;
-                    bool alive = entry.Value;
                     if (handled.Any(x => x.Key == entity.GetType()))
                     {
 
@@ -170,8 +174,7 @@ namespace myEntityRepository
                         handled[entity.GetType()].Add((int)entity.id);
                     }
                 }
-            }
-            Mementos = new List<Dictionary<Entity, bool>>();
+            _Mementos = new List<Memento>();
         }
 
         private Entity CreateInstance(Type entityType, List<object> parameters)
@@ -268,23 +271,14 @@ namespace myEntityRepository
         public Entity Save(Entity entity)
         {
             entity = SetEntity(entity);
-            Mementos.Add(new Dictionary<Entity, bool>()
-                {
-                    { entity.Clone(),true },
-                }
-            );
+            _Mementos.Add(new Memento(entity.Clone(), true));
             return entity;
         }
         public void Remove(Entity entity)
         {
            // dataStorage.RemoveEntity(entity);
             Entities[entity.GetType()].Remove(entity);
-
-            Mementos.Add(new Dictionary<Entity, bool>()
-                {
-                    { entity.Clone(),false},
-                }
-            );
+            _Mementos.Add(new Memento(entity.Clone(), false));
             entity = null;
         }
         public void CreateSchema(Type entityType)
