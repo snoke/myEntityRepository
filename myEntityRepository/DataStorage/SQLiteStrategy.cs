@@ -171,9 +171,12 @@ namespace myEntityRepository.DataStorage
         public override int GetNextId(Type entityType)
         {
             List<List<string>> Result = query("SELECT id FROM " + entityType.Name + " WHERE id = (SELECT MAX(id) FROM " + entityType.Name + ");");
+
             if (Result.Any())
             {
-                return Int32.Parse(Result.Single().First()) + 1;
+                int i = 0;
+                Int32.TryParse(Result.Single().First(), out i);
+                return i + 1;
 
             }
             else
