@@ -4,12 +4,29 @@ simple ORM Repository supporting 1:1 aggregations and different data storage str
 ```c#
 using myEntityRepository;
 [...]
-EntityRepository Repo = new EntityRepository(EntityTypes, true);
+
+//our first object to be stored in database
 ExampleModel obj = new ExampleModel("Joe Doe");
 
-if (!Repo.Entities[obj.GetType()].Any(x=>x.Name==obj.Name) {
-  Repo.Save(obj);
-  Repo.Flush();
+//the repository works by Types to load class informations
+Type objectType = obj.GetType();
+
+//define entity types to be controlled by repository
+EntityTypes = new List<Type>() { objectType }; 
+
+//define repositories data storage strategy
+DataStorage dataStorage = new SQLiteStrategy("db.sqlite", EntityTypes, debug); 
+
+EntityRepository Repo = new EntityRepository(EntityTypes, dataStorage, debug);
+
+//easy access to entities
+if (!Repo.Entities[objectType].Any(x=>x.Name==obj.Name) {
+  //store new object in repository
+  Repo.Save(obj); 
+  Repo.Flush(); //flush repository into data storage (write database entries)
+} else {
+  Message("You want to override your previous version?");
+  [...]
 }
 ```
 
