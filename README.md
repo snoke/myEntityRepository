@@ -1,5 +1,5 @@
 # myEntityRepository
-simple ORM Repository using SQLite Strategy
+simple ORM Repository supporting 1:1 aggregations and different strategies (mysql,sqlite,xml) as data storage
 
 ```c#
 using myEntityRepository;
