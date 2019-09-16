@@ -9,16 +9,15 @@ namespace myEntityRepositoryExample
     public class ExampleModel:Entity
     {
         private string name;
+        private string name2;
 
         public string Name { get => name; set => name = value; }
+        public string Name2 { get => name2; set => name2 = value; }
 
-        public ExampleModel(string name) : base(null)
+        public ExampleModel(int? id, string name, string name2):base(id)
         {
             Name = name;
-        }
-        public ExampleModel(int? id, string name):base(id)
-        {
-            Name = name;
+            Name2 = name2;
         }
 
     }
