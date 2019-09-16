@@ -68,9 +68,24 @@ namespace myEntityRepository
 
 
         #region constructors
-        public EntityRepository(List<Type> types, bool debug)
+        public EntityRepository(List<Type> types)
         {
-            dataStorage = new SQLiteStrategy("db.sqlite", types, debug);
+            Init(types, new SQLiteStrategy("db.sqlite", types, false), false);
+        }
+        public EntityRepository(List<Type> types, DataStorage.DataStorage strategy)
+        {
+            Init(types, strategy, false);
+        }
+        public EntityRepository(List<Type> types, DataStorage.DataStorage strategy, bool debug)
+        {
+            Init(types, strategy, debug);
+        }
+        public void Init(List<Type> types, DataStorage.DataStorage strategy, bool debug)
+        {
+            // dataStorage = new SQLiteStrategy("db.sqlite", types, debug);
+            //dataStorage = new MysqlStrategy("localhost","test", "root", "", types, debug);
+            //dataStorage = new XmlStrategyPrototype();
+            dataStorage = strategy;
             Types = types;
             Entities = new Dictionary<Type, List<Entity>>();
             NextId = new Dictionary<Type, int>();
