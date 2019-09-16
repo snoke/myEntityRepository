@@ -48,7 +48,13 @@ namespace myEntityRepository.Model
         public List<PropertyInfo> GetProperties()
         {
             Type eType = this.GetType();
-            List<PropertyInfo> properties = eType.GetProperties().Reverse().ToList();
+            List<PropertyInfo> properties = eType.GetProperties().ToList();
+
+            return properties
+                .GroupBy(p => p.DeclaringType)
+                .Reverse()
+                .SelectMany(g => g)
+                .ToList();
 
             //reflection lädt die erweiternden eigenschaften zuerst und die geerbten eigenschaften (id !!!) zuletzt!
             //die sonstige reihenfolge bleibt dabei bestehen

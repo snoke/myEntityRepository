@@ -200,17 +200,10 @@ namespace myEntityRepository
         private void Load(Type entityType)
         {
             List<List<string>> rows = dataStorage.LoadEntities(entityType);
-            List<PropertyInfo> properties = entityType.GetProperties().Reverse().ToList();
-            //reflection lädt die erweiternden eigenschaften zuerst und die geerbten eigenschaften (id !!!) zuletzt!
-            //die sonstige reihenfolge bleibt dabei bestehen
-            //TODO:anderes matching für tiefere abstraktion
-            List<PropertyInfo> _properties = new List<PropertyInfo>
-            {
-                properties[0]
-            };
-            properties.Reverse();
-            _properties.AddRange(properties);
-            _properties.RemoveAt(_properties.Count() - 1);
+            List<PropertyInfo> _properties = entityType.GetProperties().GroupBy(p => p.DeclaringType)
+                .Reverse()
+                .SelectMany(g => g)
+                .ToList();
 
             foreach (List<string> row in rows)
             {

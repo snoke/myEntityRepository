@@ -121,7 +121,10 @@ namespace myEntityRepository.DataStorage
         {
             Type eType = e.GetType();
             string sql = "REPLACE INTO " + eType.Name + "(";
-            List<PropertyInfo> properties = eType.GetProperties().Reverse().ToList();
+            List<PropertyInfo> properties = eType.GetProperties().ToList().GroupBy(p => p.DeclaringType)
+                .Reverse()
+                .SelectMany(g => g)
+                .ToList();
             foreach (PropertyInfo property in properties)
             {
                 sql += property.Name.ToLower() + ",";
@@ -196,20 +199,17 @@ namespace myEntityRepository.DataStorage
         {
             string sql = "CREATE TABLE IF NOT EXISTS " + eType.Name + "(";
 
-            List<PropertyInfo> properties = eType.GetProperties().Reverse().ToList();
+            //List<PropertyInfo> properties = eType.GetProperties().Reverse().ToList();
 
-            //reflection lädt die erweiternden eigenschaften zuerst und die geerbten eigenschaften (id !!!) zuletzt!
-            //die sonstige reihenfolge bleibt dabei bestehen
-            //Todo:anderes matching für tiefere abstraktion
-            List<PropertyInfo> _properties = new List<PropertyInfo>
-            {
-                properties[0]
-            };
-            properties.Reverse();
-            _properties.AddRange(properties);
-            _properties.RemoveAt(_properties.Count() - 1);
 
-            foreach (PropertyInfo property in _properties)
+            List<PropertyInfo> properties = eType.GetProperties().ToList().GroupBy(p => p.DeclaringType)
+                .Reverse()
+                .SelectMany(g => g)
+                .ToList();
+
+               
+
+            foreach (PropertyInfo property in properties)
             {
                 if (property.Name.ToLower() == "id")
                 {
