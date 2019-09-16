@@ -12,7 +12,7 @@ ExampleModel obj = new ExampleModel("Joe Doe");
 Type objectType = obj.GetType();
 
 //define entity types to be controlled by repository
-EntityTypes = new List<Type>() { objectType }; 
+List<Type> EntityTypes = new List<Type>() { objectType }; 
 
 //define repositories data storage strategy
 DataStorage dataStorage = new SQLiteStrategy("db.sqlite", EntityTypes, debug); 
