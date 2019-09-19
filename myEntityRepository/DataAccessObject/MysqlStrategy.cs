@@ -7,9 +7,9 @@ using myEntityRepository.Model;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-namespace myEntityRepository.DataStorage
+namespace myEntityRepository.DataAccessObject
 {
-    class MysqlStrategy : DataStorage
+    class MysqlStrategy : DataAccessObject
     {
         #region properties
         private MySqlConnection connection;
@@ -36,12 +36,12 @@ namespace myEntityRepository.DataStorage
             }
             set { }
         }
-        public List<Type> EntityTypes { get => entityTypes; set => entityTypes = value; }
-        public bool Debug { get => debug; set => debug = value; }
-        public string Server { get => server; set => server = value; }
-        public string Database { get => database; set => database = value; }
-        public string Username { get => username; set => username = value; }
-        public string Password { get => password; set => password = value; }
+        public List<Type> EntityTypes { get { return entityTypes; } set { entityTypes = value; } }
+        public bool Debug { get { return debug; } set { debug = value; } }
+        public string Server { get { return server; } set { server = value; } }
+        public string Database { get { return database; } set { database = value; } }
+        public string Username { get { return username; } set { username = value; } }
+        public string Password { get { return password; } set { password = value; } }
         #endregion
 
         #region constructors

@@ -11,8 +11,8 @@ namespace myEntityRepositoryExample
         private string name;
         private string name2;
 
-        public string Name { get => name; set => name = value; }
-        public string Name2 { get => name2; set => name2 = value; }
+        public string Name { get { return name; } set { name = value; } }
+        public string Name2 { get { return name2; } set { name2 = value; } }
 
         public ExampleModel(int? id, string name, string name2):base(id)
         {

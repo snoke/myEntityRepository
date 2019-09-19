@@ -14,9 +14,9 @@ using System.Reflection;
 using System.Xml.Linq;
 using myEntityRepository.Model;
 
-namespace myEntityRepository.DataStorage
+namespace myEntityRepository.DataAccessObject
 {
-    public class XmlStrategyPrototype:DataStorage
+    public class XmlStrategyPrototype:DataAccessObject
 
     {
         #region properties

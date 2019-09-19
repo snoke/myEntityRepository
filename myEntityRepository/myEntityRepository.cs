@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using myEntityRepository.DataStorage;
+using myEntityRepository.DataAccessObject;
 using myEntityRepository.Model;
 
 namespace myEntityRepository
@@ -18,7 +18,7 @@ namespace myEntityRepository
     public class EntityRepository
     {
         #region properties
-        private DataStorage.DataStorage _dataStorage;
+        private DataAccessObject.DataAccessObject _dataAccessObject;
         private List<Type> _types;
         private Dictionary<Type, int> _nextId;
         private Dictionary<Type, List<Entity>> _entities;
@@ -40,7 +40,7 @@ namespace myEntityRepository
             get { return _mementos; }
             set { _mementos = value; }
         }
-        private List<Type> Types
+        public List<Type> Types
         {
             get { return _types; }
             set { _types = value; }
@@ -59,10 +59,10 @@ namespace myEntityRepository
             set { _entities = value; }
         }
 
-        private DataStorage.DataStorage dataStorage
+        public DataAccessObject.DataAccessObject dataAccessObject
         {
-            get { return _dataStorage; }
-            set { _dataStorage = value; }
+            get { return _dataAccessObject; }
+            set { _dataAccessObject = value; }
         }
         #endregion
 
@@ -72,20 +72,20 @@ namespace myEntityRepository
         {
             Init(types, new SQLiteStrategy("db.sqlite", types, false), false);
         }
-        public EntityRepository(List<Type> types, DataStorage.DataStorage strategy)
+        public EntityRepository(List<Type> types, DataAccessObject.DataAccessObject strategy)
         {
             Init(types, strategy, false);
         }
-        public EntityRepository(List<Type> types, DataStorage.DataStorage strategy, bool debug)
+        public EntityRepository(List<Type> types, DataAccessObject.DataAccessObject strategy, bool debug)
         {
             Init(types, strategy, debug);
         }
-        public void Init(List<Type> types, DataStorage.DataStorage strategy, bool debug)
+        public void Init(List<Type> types, DataAccessObject.DataAccessObject strategy, bool debug)
         {
-            // dataStorage = new SQLiteStrategy("db.sqlite", types, debug);
-            //dataStorage = new MysqlStrategy("localhost","test", "root", "", types, debug);
-            //dataStorage = new XmlStrategyPrototype();
-            dataStorage = strategy;
+            // dataAccessObject = new SQLiteStrategy("db.sqlite", types, debug);
+            //dataAccessObject = new MysqlStrategy("localhost","test", "root", "", types, debug);
+            //dataAccessObject = new XmlStrategyPrototype();
+            dataAccessObject = strategy;
             Types = types;
             Entities = new Dictionary<Type, List<Entity>>();
             NextId = new Dictionary<Type, int>();
@@ -94,7 +94,7 @@ namespace myEntityRepository
             foreach (Type type in Types)
             {
                 CreateSchema(type);
-                NextId[type] = dataStorage.GetNextId(type);
+                NextId[type] = dataAccessObject.GetNextId(type);
                 //NextId[entry.Value] = 1;
                 Entities[type] = new List<Entity>();
             }
@@ -103,7 +103,29 @@ namespace myEntityRepository
         #endregion
 
         #region workers
+        public void ClearMementos()
+        {
+            this.Mementos = new List< Dictionary<Entity,bool>>();
+        }
+        public void Export()
+        {
+            Export(this.dataAccessObject);
+        }
 
+        public void Export(DataAccessObject.DataAccessObject strategy)
+        {
+            foreach(Type type in this.Types)
+            {
+                strategy.CreateSchema(type);
+            }
+            foreach (Type type in this.Types)
+            {
+                foreach (Entity e in this.Entities[type])
+                {
+                    strategy.SaveEntity(e);
+                }
+            }
+        }
         public bool IsDirty() //Ungespeicherte Änderungen?
         {
             return (_Mementos.Count() > 0);
@@ -122,30 +144,6 @@ namespace myEntityRepository
                 Load(type);
             }
             return Entities;
-            /*
-            string listname = nameof(ICollection);
-            foreach (KeyValuePair<Type, List<Entity>> entry in Entities)
-            {
-                foreach (Entity entity in entry.Value)
-                {
-                    BindingFlags universalBindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static;
-                    foreach (FieldInfo fieldinfo in entry.Key.GetFields(universalBindingFlags))
-                    {
-                        Type  fieldType= fieldinfo.FieldType;
-                        if (fieldType.GetInterface(listname) != null)
-                        {
-                            List<Entity> list = new List<Entity>();
-                            foreach(int children in (List<int>)fieldinfo.GetValue(entity))
-                            {
-                                Console.WriteLine();
-                                //  list.Add();
-                                Console.ReadLine();
-                            }
-                        }
-                    }
-                }
-            }
-            */
         }
         public void Flush() //Speichert den letzten Zustand aller geänderten Objekte in die Datenbank und leert die Mementos
         {
@@ -179,13 +177,13 @@ namespace myEntityRepository
                         } else
                         {
                             handled[entity.GetType()].Add((int)entity.id);
-                            dataStorage.RemoveEntity(entity);
+                            dataAccessObject.RemoveEntity(entity);
                            Entities[entity.GetType()].RemoveAll(x => x.id == entity.id);
                         }
                     }
                     else
                     {
-                        entity.id = dataStorage.SaveEntity(entity);
+                        entity.id = dataAccessObject.SaveEntity(entity);
                         handled[entity.GetType()].Add((int)entity.id);
                     }
                 }
@@ -199,7 +197,7 @@ namespace myEntityRepository
         }
         private void Load(Type entityType)
         {
-            List<List<string>> rows = dataStorage.LoadEntities(entityType);
+            List<List<string>> rows = dataAccessObject.LoadEntities(entityType);
             List<PropertyInfo> _properties = entityType.GetProperties().GroupBy(p => p.DeclaringType)
                 .Reverse()
                 .SelectMany(g => g)
@@ -255,7 +253,6 @@ namespace myEntityRepository
 
         private Entity SetEntity(Entity entity)
         {
-
             if (entity.id != null && Entities[entity.GetType()].Any(x => x.id == entity.id))
             {
                 int index = Entities[entity.GetType()].FindIndex(x => x.id == entity.id);
@@ -269,9 +266,7 @@ namespace myEntityRepository
                     entity.id = GetNextId(entity.GetType());
                 }
                 else
-                {
-
-                }
+                {}
                 Entities[entity.GetType()].Add(entity);
                 return Entities[entity.GetType()].Last();
             }
@@ -284,14 +279,13 @@ namespace myEntityRepository
         }
         public void Remove(Entity entity)
         {
-           // dataStorage.RemoveEntity(entity);
             Entities[entity.GetType()].Remove(entity);
             _Mementos.Add(new Memento(entity.Clone(), false));
             entity = null;
         }
         public void CreateSchema(Type entityType)
         {
-            dataStorage.CreateSchema(entityType);
+            dataAccessObject.CreateSchema(entityType);
         }
         #endregion
     }

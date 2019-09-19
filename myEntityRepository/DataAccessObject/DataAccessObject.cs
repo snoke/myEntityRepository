@@ -12,9 +12,9 @@ using System.Linq;
 using System.Reflection;
 using myEntityRepository.Model;
 
-namespace myEntityRepository.DataStorage
+namespace myEntityRepository.DataAccessObject
 {
-    public abstract class DataStorage
+    public abstract class DataAccessObject
     {
         #region properties
         #endregion

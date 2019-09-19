@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using myEntityRepository;
-using myEntityRepository.DataStorage;
+using myEntityRepository.DataAccessObject;
 namespace myEntityRepositoryExample
 {
     class Example

@@ -11,8 +11,8 @@ namespace myEntityRepositoryExample
     {
         private string abstractName;
         private string abstractName2;
-        public string AbstractName { get => abstractName; set => abstractName = value; }
-        public string AbstractName2 { get => abstractName2; set => abstractName2 = value; }
+        public string AbstractName { get { return abstractName; } set { abstractName = value; } }
+        public string AbstractName2 { get { return abstractName2; } set { abstractName2 = value; } }
         public ExampleSubModel(int? id,string name, string name2, string abstractName, string abstractName2 ) :base(id,name, name2)
         {
             this.AbstractName = abstractName;

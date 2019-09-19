@@ -13,9 +13,9 @@ using System.Linq;
 using System.Reflection;
 using myEntityRepository.Model;
 
-namespace myEntityRepository.DataStorage
+namespace myEntityRepository.DataAccessObject
 {
-    public class SQLiteStrategy : DataStorage
+    public class SQLiteStrategy : DataAccessObject
     {
         #region properties
 
