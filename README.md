@@ -25,7 +25,7 @@ if (!Repo.Entities[objectType].Any(x=>x.Name==obj.Name) {
   Repo.Save(obj); 
   Repo.Flush(); //flush repository into data storage (write database entries)
 } else {
-  Message("You want to override your previous version?");
+  Message("Do you want to override your previous version?");
   [...]
 }
 ```
