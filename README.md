@@ -1,5 +1,5 @@
 # myEntityRepository
-lightweight ORM Repository supporting 1:1 aggregations and different data storage strategies (mysql,sqlite,xml)
+lightweight ORM Repository supporting 1:1 aggregations and different data storage strategies (mysql,sqlite,xml) and smart rollbacks by memento pattern
 
 ```c#
 using myEntityRepository;
