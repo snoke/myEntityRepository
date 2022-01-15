@@ -8,7 +8,7 @@ using myEntityRepository;
 //our first object to be stored in database
 ExampleModel obj = new ExampleModel("Joe Doe");
 
-//the repository works by Types to load class informations
+//the repository works by Types (Reflection) to load class informations
 Type objectType = obj.GetType();
 
 //define entity types to be controlled by repository
