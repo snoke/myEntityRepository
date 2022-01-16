@@ -29,6 +29,3 @@ if (!Repo.Entities[objectType].Any(x=>x.Name==obj.Name) {
   [...]
 }
 ```
-
-check [Example](https://github.com/snoke/myEntityRepository/tree/master/myEntityRepository/Example)
-or [BundesligaVerwalter](https://github.com/snoke/BundesligaVerwaltung) for details
